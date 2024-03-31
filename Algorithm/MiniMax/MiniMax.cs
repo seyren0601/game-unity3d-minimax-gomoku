@@ -61,33 +61,33 @@ namespace MiniMax
             Result result = CurrentState(state);
             if(result != Result.Pending)
             {
-				if (result == Result.OWin) return 100; // "O" win
-                else if (result == Result.XWin) return -100; // "X" win
+				if (result == Result.OWin) return 10; // "O" win
+                else if (result == Result.XWin) return -10; // "X" win
                 else return 0; // Draw
             }
-			if (depth == 5)
+			/*if (depth == 3)
 			{
 				int heuristic = Heuristic("O", state.board);
                 // Debug writes
 				//state.printState();
 				//Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
 				return heuristic;
-			}
+			}*/
 			if (player == "O")
             {
-                int alpha = int.MinValue;
+                int alpha = int.MaxValue;
                 foreach(State new_state in GetAllMoves(state))
                 {
-                    alpha = int.Max(alpha, MiniMax_Run(new_state, "X", depth + 1));
+                    alpha = int.Min(alpha, MiniMax_Run(new_state, "X", depth + 1));
                 }
                 return alpha;
             }
             else
             {
-                int beta = int.MaxValue;
+                int beta = int.MinValue;
                 foreach (State new_state in GetAllMoves(state))
                 {
-                    beta = int.Min(beta, MiniMax_Run(new_state, "O", depth + 1));
+                    beta = int.Max(beta, MiniMax_Run(new_state, "O", depth + 1));
                 }
                 return beta;
             }
