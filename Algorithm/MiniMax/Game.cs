@@ -24,8 +24,9 @@ namespace MiniMax
             Result result = Result.Pending;
             do
             {
-                Console.Clear();
+                //Console.Clear();
                 currentState.printState();
+                Console.WriteLine();
                 if (currentTurn == Turn.XTurn)
                 {
                     Console.WriteLine("X chọn vị trí đặt quân: ");
