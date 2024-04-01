@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class GameInfo : MonoBehaviour
 {
-    public const int n = 3;
-    public const float square_size = 2;
-    public Vector3 [,] center_points { get; set; } = new Vector3[n, n];
-    public Vector3 [,] render_points { get; set; } = new Vector3[n, n];
+    public int n { get; } = 3;
+    public float square_size {get;} = 2;
+    public Vector3 [,] center_points { get; set; }
+    public Vector3 [,] render_points { get; set; }
 
     private void Start()
     {
+        render_points = new Vector3[n,n];
+        center_points = new Vector3[n,n];
         float x, y = 3, z = 1;
         for (int i = 0; i < n; i++)
         {
