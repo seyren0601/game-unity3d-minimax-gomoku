@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,6 +14,8 @@ public class GameScript : MonoBehaviour
     State state {get;set;}
     public GameObject Black;
     public GameObject White;
+    public AudioSource audioSource;
+    public AudioSource sGameOver;
     Result result {get;set;}
     GameInfo gameInfo;
     Camera main_camera;
@@ -39,6 +41,7 @@ public class GameScript : MonoBehaviour
             if(playerTurn){
                 Mouse mouse = Mouse.current;
                 if(mouse.leftButton.wasPressedThisFrame){
+                    audioSource.Play();
                     Vector3 mousePosition = mouse.position.ReadValue();
                     //Debug.Log(mousePosition);
                     Ray ray = main_camera.ScreenPointToRay(mousePosition);
@@ -87,4 +90,6 @@ public class GameScript : MonoBehaviour
         }
         return null;
     }
+
+
 }
