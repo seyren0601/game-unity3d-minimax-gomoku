@@ -24,7 +24,7 @@ namespace MiniMax
         }
         //public static int alpha;
         //public static int beta;
-        public const int BOARD_SIZE = 5;
+        public const int BOARD_SIZE = 3;
         const int LINE_SIZE = 3;
         const int DEPTH = 3;
 
@@ -179,6 +179,8 @@ namespace MiniMax
 
             // Check horizontal
             count = 0;
+            point.x = x_original;
+            point.y = y_original;
             while (isValid(point))
             {
                 if (state.board[point.x, point.y] == state.pre.Value.Item3)
@@ -199,6 +201,8 @@ namespace MiniMax
 
             // Check top left->down right diagonal
             count = 0;
+            point.x = x_original;
+            point.y = y_original;
             while (isValid(point))
             {
                 if (state.board[point.x, point.y] == state.pre.Value.Item3)
@@ -219,6 +223,8 @@ namespace MiniMax
 
             // Check top right->down left diagonal
             count = 0;
+            point.x = x_original;
+            point.y = y_original;
             while (isValid(point))
             {
                 if (state.board[point.x, point.y] == state.pre.Value.Item3)
