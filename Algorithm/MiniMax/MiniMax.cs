@@ -24,7 +24,7 @@ namespace MiniMax
         }
         //public static int alpha;
         //public static int beta;
-        public const int BOARD_SIZE = 3;
+        public const int BOARD_SIZE = 5;
         const int LINE_SIZE = 3;
         const int DEPTH = 3;
 
