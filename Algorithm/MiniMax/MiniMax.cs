@@ -155,44 +155,87 @@ namespace MiniMax
         {
             int count = 0;
             int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
 
-            //Đếm số quân cùng hàng dọc
-            for(int i = 0; i < BOARD_SIZE; i++)
+            // Check vertical
+            while (isValid(point))
             {
-                if (state.board[i, point.y] == state.pre.Value.Item3) count += 1;
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.Up;
             }
-            if (count > max) max = count;
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.Down;
+            }
+            if (count - 1 > max) max = count - 1; //- 1 because the original point is counted twice
 
-
-            //Đếm số quân cùng hàng ngang
+            // Check horizontal
             count = 0;
-            for(int i = 0; i < BOARD_SIZE; i++)
+            while (isValid(point))
             {
-                if (state.board[point.x, i] == state.pre.Value.Item3) count += 1;
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.Left;
             }
-            if (count > max) max = count;
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.Right;
+            }
+            if (count - 1 > max) max = count - 1;
 
-            // Đếm số quân cùng hàng chéo trên trái -> dưới phải
+            // Check top left->down right diagonal
             count = 0;
-            for(int i=0;i< BOARD_SIZE; i++)
+            while (isValid(point))
             {
-                for(int j=0;j< BOARD_SIZE; j++)
-                {
-                    if (i + j == point.x + point.y && state.board[i, j] == state.pre.Value.Item3) count += 1;
-                }
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.UpLeft;
             }
-            if (count > max) max = count;
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.DownRight;
+            }
+            if (count - 1 > max) max = count - 1;
 
-            // Đếm số quan cùng hàng chéo trên phải -> dưới trái
+            // Check top right->down left diagonal
             count = 0;
-            for (int i = 0; i < BOARD_SIZE; i++)
+            while (isValid(point))
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    if (j - i == point.y - point.x && state.board[i, j] == state.pre.Value.Item3) count += 1;
-                }
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.UpRight;
             }
-            if (count > max) max = count;
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (state.board[point.x, point.y] == state.pre.Value.Item3)
+                    count += 1;
+                else break;
+                point = point.DownLeft;
+            }
+            if (count - 1 > max) max = count - 1;
             return max;
         }
 
