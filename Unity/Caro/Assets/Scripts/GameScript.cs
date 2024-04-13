@@ -5,6 +5,7 @@ using System.Drawing;
 using MiniMax;
 using UnityEditor.Build.Content;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
 using static MiniMax.MiniMax;
 
@@ -18,15 +19,17 @@ public class GameScript : MonoBehaviour
     public AudioSource sGameOver;
     Result result {get;set;}
     GameInfo gameInfo;
+    StartGame gameStart;
     Camera main_camera;
     // Start is called before the first frame update
     void Start()
     {
         main_camera = Camera.main;
         gameInfo = gameObject.GetComponent<GameInfo>();
-        string[,] startBoard = new string[gameInfo.n, gameInfo.n];
-        for(int i=0;i<gameInfo.n;i++){
-            for(int j=0;j<gameInfo.n;j++){
+        gameStart = gameObject.GetComponent<StartGame>();
+        string[,] startBoard = new string[gameStart.sizeOfBanCo, gameStart.sizeOfBanCo];
+        for(int i=0;i<gameStart.sizeOfBanCo;i++){
+            for(int j=0;j< gameStart.sizeOfBanCo; j++){
                 startBoard[i, j] = " ";
             }
         }
@@ -76,8 +79,8 @@ public class GameScript : MonoBehaviour
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){
-        for(int i=0;i<gameInfo.n;i++){
-            for(int j=0;j<gameInfo.n;j++){
+        for(int i=0;i<gameStart.sizeOfBanCo;i++){
+            for(int j=0;j<gameStart.sizeOfBanCo;j++){
                 float x_clicked = Clicked.x;
                 float z_clicked = Clicked.z;
                 Vector3 render_point = gameInfo.render_points[i,j];
