@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static MiniMax.Game;
+using UnityEngine;
 
 namespace MiniMax
 {
@@ -19,9 +20,9 @@ namespace MiniMax
         }
         //public static int alpha;
         //public static int beta;
-        public const int BOARD_SIZE = 3;
-        const int LINE_SIZE = 3;
-        const int DEPTH = 3;
+        public const int BOARD_SIZE = 5;
+        const int LINE_SIZE = 4;
+        const int DEPTH = 4;
 
         public static Point AutoPlay_GetMove(State startState, string player)
         {
@@ -48,10 +49,11 @@ namespace MiniMax
 				}
 			}*/
 			//Console.WriteLine($"Best state with h = {Heuristic("O", bestState.board)}: ");
+            Debug.Log(max_point);
 			return bestState.pre.Value.Item2;
         }
 
-         public static int MiniMax_Run(State state, int alpha, int beta, string player, int depth)
+        public static int MiniMax_Run(State state, int alpha, int beta, string player, int depth)
         {
             Result result = CurrentState(state);
             if(result != Result.Pending)
@@ -60,15 +62,15 @@ namespace MiniMax
                 else if (result == Result.XWin) return int.MinValue; // "X" win
                 else return 0; // Draw
             }
-                if (depth == DEPTH)
-                {
-                    int heuristic = Heuristic(state, "O");
-                    // Debug writes
-                    //state.printState();
-                    //Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
-                    return heuristic;
-                }
-                if (player == "O")
+            if (depth == DEPTH)
+            {
+                int heuristic = Heuristic(state, "O");
+                // Debug writes
+                //state.printState();
+                //Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
+                return heuristic;
+            }
+            if (player == "O")
             {
                 foreach(State new_state in GetAllMoves(state))
                 {
@@ -141,7 +143,7 @@ namespace MiniMax
         public static (bool, string?) isWinMove(State state)
         {
             if (state.pre is null) return (false, null);
-            if (countLine(state, state.pre.Value.Item2) == LINE_SIZE)
+            if (countLine(state, state.pre.Value.Item2) >= LINE_SIZE)
                 return (true, state.pre.Value.Item3);
             return (false, null);
         }
@@ -156,19 +158,19 @@ namespace MiniMax
 
             // Check vertical
             count = CountVertical(point, player, state.board).Item2;
-            if (count - 1 > max) max = count;
+            if (count > max) max = count;
 
             // Check horizontal
             count = CountHorizontal(point, player, state.board).Item2;
-            if (count - 1 > max) max = count;
+            if (count > max) max = count;
 
             // Check top left->down right diagonal
             count = CountDiagonal1(point, player, state.board).Item2;
-            if (count - 1 > max) max = count;
+            if (count > max) max = count;
 
             // Check top right->down left diagonal
             count = CountDiagonal2(point, player, state.board).Item2;
-            if (count - 1 > max) max = count;
+            if (count > max) max = count;
             return max;
         }
 

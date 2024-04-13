@@ -36,7 +36,7 @@ public class GameScript : MonoBehaviour
     void Update()
     {
         //Debug click
-        Mouse mouse = Mouse.current;
+        /*Mouse mouse = Mouse.current;
         if(mouse.leftButton.wasPressedThisFrame){
             audioSource.Play();
             Vector3 mousePosition = mouse.position.ReadValue();
@@ -45,10 +45,9 @@ public class GameScript : MonoBehaviour
             if(Physics.Raycast(ray, out RaycastHit hit)){
                 Debug.Log(hit.point);
             }
-        }
+        }*/
 
         //GameLoop
-        /*
         if(result == Result.Pending){
             if(playerTurn){
                 Mouse mouse = Mouse.current;
@@ -84,7 +83,7 @@ public class GameScript : MonoBehaviour
                 playerTurn = true;
             }
             result = CurrentState(state);
-        }*/
+        }
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){
