@@ -9,14 +9,14 @@ public class StartGame : MonoBehaviour
 
     GameObject[,] duongViens;
 
-    public float x_start {  get; set; }
-    public float z_start { get; set; }
+    public float x_start { get; private set; }
+    public float z_start {  get; private set; } 
 
     private const float sizeOneO = 2;
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         float campos_x, campos_y, campos_z;
         campos_x = Camera.main.transform.position.x;
@@ -25,6 +25,10 @@ public class StartGame : MonoBehaviour
         Camera.main.transform.position = 
             new Vector3(campos_x,campos_y,campos_z);
         banCo = GameObject.FindGameObjectWithTag("MatBanCo");
+
+        x_start = duongVien.transform.position.x - (sizeOfBanCo - 1);
+        z_start = duongVien.transform.position.z + (sizeOfBanCo - 1);
+
         InitDuongVien();
         InitSizeBanCo();
         SpawnDuongVien();
@@ -61,7 +65,6 @@ public class StartGame : MonoBehaviour
                 {
                     duongViens[i,j].transform.position = new Vector3(x, y, z);
                 }
-                Debug.Log(z);
             }
         }
     }
@@ -69,9 +72,6 @@ public class StartGame : MonoBehaviour
     private void InitDuongVien()
     {
         duongViens = new GameObject[sizeOfBanCo, sizeOfBanCo];
-        x_start = duongVien.transform.position.x * sizeOfBanCo;
-        z_start = duongVien.transform.position.z + (sizeOfBanCo - 1);
-        Debug.Log($"{duongVien.transform.position.z}, {sizeOfBanCo}, {z_start}");
         for (int i = 0; i < sizeOfBanCo; i++)
         {
             for (int j = 0; j < sizeOfBanCo; j++)

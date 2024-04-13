@@ -339,7 +339,7 @@ Transform:
   m_GameObject: {fileID: 705507993}
   serializedVersion: 2
   m_LocalRotation: {x: 0.38029832, y: 0.39530766, z: -0.18433498, w: 0.8155524}
-  m_LocalPosition: {x: -4.25, y: 0.12, z: 2.42}
+  m_LocalPosition: {x: -4.27, y: 1.39, z: -1.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -480,8 +480,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c07f358c650163249ab286d4b596c32d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duongVien: {fileID: 5511934492960688741, guid: 1b79383f92f966c499e0cf59bc17a0d3, type: 3}
-  sizeOfBanCo: 4
+  duongVien: {fileID: 5197053165322725963, guid: 15d586e22c6d6a746958605640526b0b, type: 3}
+  sizeOfBanCo: 3
 --- !u!1 &999355574
 GameObject:
   m_ObjectHideFlags: 0
