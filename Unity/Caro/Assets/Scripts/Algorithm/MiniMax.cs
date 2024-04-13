@@ -3,12 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using static MiniMax.Game;
 
 namespace MiniMax
@@ -33,7 +28,7 @@ namespace MiniMax
             List<(State, int)> Moves = new List<(State, int)>();
             foreach(State state in GetAllMoves(startState))
             {
-                int point = MiniMax_Run(state, player, 0);
+                int point = MiniMax_Run(state, int.MinValue, int.MaxValue, "X", 0);
                 Moves.Add((state, point));
             }
             int max_point = Moves.Max(x => x.Item2);
@@ -56,38 +51,38 @@ namespace MiniMax
 			return bestState.pre.Value.Item2;
         }
 
-        public static int MiniMax_Run(State state, string player, int depth)
+         public static int MiniMax_Run(State state, int alpha, int beta, string player, int depth)
         {
             Result result = CurrentState(state);
             if(result != Result.Pending)
             {
-				if (result == Result.OWin) return 10; // "O" win
-                else if (result == Result.XWin) return -10; // "X" win
+                if (result == Result.OWin) return int.MaxValue; // "O" win
+                else if (result == Result.XWin) return int.MinValue; // "X" win
                 else return 0; // Draw
             }
-			/*if (depth == 3)
-			{
-				int heuristic = Heuristic("O", state.board);
-                // Debug writes
-				//state.printState();
-				//Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
-				return heuristic;
-			}*/
-			if (player == "O")
+                if (depth == DEPTH)
+                {
+                    int heuristic = Heuristic(state, "O");
+                    // Debug writes
+                    //state.printState();
+                    //Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
+                    return heuristic;
+                }
+                if (player == "O")
             {
-                int alpha = int.MaxValue;
                 foreach(State new_state in GetAllMoves(state))
                 {
-                    alpha = Math.Min(alpha, MiniMax_Run(new_state, "X", depth + 1));
+                    alpha = Math.Max(alpha, MiniMax_Run(new_state, alpha, beta, "X", depth + 1));
+                    if (beta <= alpha) break;
                 }
                 return alpha;
             }
             else
             {
-                int beta = int.MinValue;
                 foreach (State new_state in GetAllMoves(state))
                 {
-                    beta = Math.Max(beta, MiniMax_Run(new_state, "O", depth + 1));
+                    beta = Math.Min(beta, MiniMax_Run(new_state, alpha, beta, "O", depth + 1));
+                    if (beta <= alpha) break;
                 }
                 return beta;
             }
@@ -133,9 +128,9 @@ namespace MiniMax
 
         public static bool isFull(string[,] state)
         {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < BOARD_SIZE; i++)
             {
-                for(int j = 0; j < 3; j++)
+                for(int j = 0; j < BOARD_SIZE; j++)
                 {
                     if (state[i, j] == " ") return false;
                 }
@@ -151,48 +146,29 @@ namespace MiniMax
             return (false, null);
         }
 
-        public static int countLine(State state, Point point) // Đếm số quân cùng loại ở các hàng dọc, ngang, chéo bắt đầu từ ô cho trước
+        public static int countLine(State state, Point point) 
         {
             int count = 0;
             int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
+            string player = state.pre.Value.Item3;
 
-            //Đếm số quân cùng hàng dọc
-            for(int i = 0; i < BOARD_SIZE; i++)
-            {
-                if (state.board[i, point.y] == state.pre.Value.Item3) count += 1;
-            }
-            if (count > max) max = count;
+            // Check vertical
+            count = CountVertical(point, player, state.board).Item2;
+            if (count - 1 > max) max = count;
 
+            // Check horizontal
+            count = CountHorizontal(point, player, state.board).Item2;
+            if (count - 1 > max) max = count;
 
-            //Đếm số quân cùng hàng ngang
-            count = 0;
-            for(int i = 0; i < BOARD_SIZE; i++)
-            {
-                if (state.board[point.x, i] == state.pre.Value.Item3) count += 1;
-            }
-            if (count > max) max = count;
+            // Check top left->down right diagonal
+            count = CountDiagonal1(point, player, state.board).Item2;
+            if (count - 1 > max) max = count;
 
-            // Đếm số quân cùng hàng chéo trên trái -> dưới phải
-            count = 0;
-            for(int i=0;i< BOARD_SIZE; i++)
-            {
-                for(int j=0;j< BOARD_SIZE; j++)
-                {
-                    if (i + j == point.x + point.y && state.board[i, j] == state.pre.Value.Item3) count += 1;
-                }
-            }
-            if (count > max) max = count;
-
-            // Đếm số quan cùng hàng chéo trên phải -> dưới trái
-            count = 0;
-            for (int i = 0; i < BOARD_SIZE; i++)
-            {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    if (j - i == point.y - point.x && state.board[i, j] == state.pre.Value.Item3) count += 1;
-                }
-            }
-            if (count > max) max = count;
+            // Check top right->down left diagonal
+            count = CountDiagonal2(point, player, state.board).Item2;
+            if (count - 1 > max) max = count;
             return max;
         }
 
@@ -202,72 +178,204 @@ namespace MiniMax
             return true;
         }
 
-        public static int Heuristic(string player, string[,] board)
+        public static int Heuristic(State state, string player)
         {
             string enemy = player == "O" ? "X" : "O";
-            int count_player = 0;
-            int count_enemy = 0;
+            int player_point = 0;
 
-            // Count number of rows and columns that have win potential
-            for(int i=0;i< BOARD_SIZE; i++)
+            for(int i = 0; i < BOARD_SIZE; i++)
             {
-                List<string> pieces_in_row = new List<string>();
-                List<string> pieces_in_column = new List<string>();
                 for(int j=0;j< BOARD_SIZE; j++)
                 {
-                    pieces_in_row.Add(board[i,j]);
-                    pieces_in_column.Add(board[j, i]);
+                    Point currentPoint = new Point(i, j);
+                    if (state.board[i,j] == player)
+                    {
+                        (int, int) horizontal = CountHorizontal(currentPoint, player, state.board);
+                        (int, int) vertical = CountVertical(currentPoint, player, state.board);
+                        (int, int) diagonal1 = CountDiagonal1(currentPoint, player, state.board);
+                        (int, int) diagonal2 = CountDiagonal2(currentPoint, player, state.board);
+
+                        // Đánh giá trạng thái bằng heuristic cho từng quân đã đặt lên bàn cờ
+                        // Nếu có LINE_SIZE - 1 quân liền nhau và hở 2 hoặc 1 đầu
+                        /*if (horizontal.Item2 == LINE_SIZE - 1 && horizontal.Item1 > 0) player_point = int.MaxValue;
+                        if (vertical.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;
+                        if (diagonal1.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;
+                        if (diagonal1.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;*/
+
+                        // Nếu có LINE_SIZE - 2 quân liền nhau và hở 2 hoặc 1 đầu
+                        if (horizontal.Item1 == 2 && horizontal.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
+                        else if (horizontal.Item1 == 1) player_point += 5;
+                        if (vertical.Item1 > 0 && vertical.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
+                        else if (vertical.Item1 == 1) player_point += 5;
+                        if (diagonal1.Item1 > 0 && diagonal1.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
+                        else if (diagonal1.Item1 == 1) player_point += 5;
+                        if (diagonal2.Item1 > 0 && diagonal2.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
+                        else if (diagonal2.Item1 == 1) player_point += 5;
+
+                        // Nếu có LINE_SIZE - 3 quân liền nhau và hở 2 hoặc 1 đầu
+                        if (LINE_SIZE - 3 > 0)
+                        {
+                            if (horizontal.Item1 > 0 && horizontal.Item2 == LINE_SIZE - 3) player_point += 3;
+                            if (vertical.Item1 > 0 && vertical.Item2 == LINE_SIZE - 3) player_point += 3;
+                            if (diagonal1.Item1 > 0 && diagonal1.Item2 == LINE_SIZE - 3) player_point += 3;
+                            if (diagonal2.Item1 > 0 && diagonal2.Item2 == LINE_SIZE - 3) player_point += 3;
+                        }
+                    }
                 }
+            }
+            return player_point;
+        }
 
-                // row
-                if(pieces_in_row.Contains(enemy) && pieces_in_row.Contains(player))
-                {
-					count_player += pieces_in_row.Count(x => x == player);
-					count_enemy += pieces_in_row.Count(x => x == enemy);
-				}
+        // item1 = Số ô trống ở 2 đầu
+        // item2 = Số quân liền nhau
+        public static (int, int) CountHorizontal(Point point, string player, string[,] board)
+        {
+            int count = 0;
+            int count_blank = 0;
+            int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
+
+            // Check vertical
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
                 else
                 {
-                    if (pieces_in_row.Count(x => x == player) == 2) count_player += 3;
-                    else count_enemy += 3;
-				}
-
-                // column
-                if(pieces_in_column.Contains(enemy) && pieces_in_column.Contains(player))
-                {
-                    count_player += pieces_in_column.Count(x => x == player);
-                    count_enemy += pieces_in_column.Count(x => x == enemy);
-				}
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.Up;
+            }
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
                 else
                 {
-					if (pieces_in_column.Count(x => x == player) == 2) count_player += 3;
-					else count_enemy += 3;
-				}
-			}
-            List<string> Diagonal1 = new List<string> { board[0, 0], board[1, 1], board[2, 2] };
-            // ^
-            if(Diagonal1.Contains(enemy) && Diagonal1.Contains(player))
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.Down;
+            }
+            if (count - 1 > max) max = count - 1; //- 1 because the original point is counted twice
+            return (count_blank, max);
+        }
+
+        public static (int, int) CountVertical(Point point, string player, string[,] board)
+        {
+            int count = 0;
+            int count_blank = 0;
+            int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
+
+            // Check vertical
+            while (isValid(point))
             {
-				count_player += Diagonal1.Count(x => x == player);
-				count_enemy += Diagonal1.Count(x => x == player);
-			}
-            else
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.Left;
+            }
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
             {
-				if (Diagonal1.Count(x => x == player) == 2) count_player += 3;
-				else count_enemy += 3;
-			}
-			// ^
-			List<string> Diagonal2 = new List<string> { board[0, 2], board[1, 1], board[2, 0] };
-			if (Diagonal2.Contains(enemy) && Diagonal2.Contains(player))
-			{
-				count_player += Diagonal2.Count(x => x == player);
-				count_enemy += 2 * Diagonal2.Count(x => x == player);
-			}
-			else
-			{
-				if (Diagonal2.Count(x => x == player) == 2) count_player += 3;
-				else count_enemy += 3;
-			}
-			return count_player - count_enemy;
-		}
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.Right;
+            }
+            if (count - 1 > max) max = count - 1; //- 1 because the original point is counted twice
+            return (count_blank, max);
+        }
+
+        // Topright->BottomLeft
+        public static (int, int) CountDiagonal1(Point point, string player, string[,] board)
+        {
+            int count = 0;
+            int count_blank = 0;
+            int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
+
+            // Check vertical
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.UpRight;
+            }
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.DownLeft;
+            }
+            if (count - 1 > max) max = count - 1; //- 1 because the original point is counted twice
+            return (count_blank, max);
+        }
+
+        // Topleft->BottomRight
+        public static (int, int) CountDiagonal2(Point point, string player, string[,] board)
+        {
+            int count = 0;
+            int count_blank = 0;
+            int max = int.MinValue;
+            int x_original = point.x;
+            int y_original = point.y;
+
+            // Check vertical
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.UpLeft;
+            }
+            point.x = x_original;
+            point.y = y_original;
+            while (isValid(point))
+            {
+                if (board[point.x, point.y] == player)
+                    count += 1;
+                else
+                {
+                    if (board[point.x, point.y] == " ") count_blank += 1;
+                    break;
+                }
+                point = point.DownRight;
+            }
+            if (count - 1 > max) max = count - 1; //- 1 because the original point is counted twice
+            return (count_blank, max);
+        }
     }
 }

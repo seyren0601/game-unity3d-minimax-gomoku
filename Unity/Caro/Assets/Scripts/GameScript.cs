@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using MiniMax;
-using UnityEditor.Build.Content;
+﻿using MiniMax;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static MiniMax.MiniMax;
@@ -37,6 +32,20 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Debug click
+        Mouse mouse = Mouse.current;
+        if(mouse.leftButton.wasPressedThisFrame){
+            audioSource.Play();
+            Vector3 mousePosition = mouse.position.ReadValue();
+            //Debug.Log(mousePosition);
+            Ray ray = main_camera.ScreenPointToRay(mousePosition);
+            if(Physics.Raycast(ray, out RaycastHit hit)){
+                Debug.Log(hit.point);
+            }
+        }
+
+        //GameLoop
+        /*
         if(result == Result.Pending){
             if(playerTurn){
                 Mouse mouse = Mouse.current;
@@ -72,7 +81,7 @@ public class GameScript : MonoBehaviour
                 playerTurn = true;
             }
             result = CurrentState(state);
-        }
+        }*/
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){
