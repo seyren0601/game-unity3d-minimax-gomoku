@@ -18,18 +18,20 @@ namespace MiniMax
             Draw,
             Pending
         }
-        //public static int alpha;
-        //public static int beta;
+        public static int alpha_root;
+        public static int beta_root;
         public static int BOARD_SIZE = Camera.main.GetComponent<GameInfo>().n;
         public static int LINE_SIZE = StartGame.lineSize;
-        const int DEPTH = 2;
+        const int DEPTH = 5;
 
         public static Point AutoPlay_GetMove(State startState, string player)
         {
             List<(State, int)> Moves = new List<(State, int)>();
+            alpha_root = int.MinValue;
+            beta_root = int.MaxValue;
             foreach(State state in GetAllMoves(startState))
             {
-                int point = MiniMax_Run(state, int.MinValue, int.MaxValue, "X", 0);
+                int point = MiniMax_Run(state, alpha_root, beta_root, "X", 1);
                 Moves.Add((state, point));
             }
             int max_point = Moves.Max(x => x.Item2);
@@ -64,7 +66,7 @@ namespace MiniMax
             }
             if (depth == DEPTH)
             {
-                int heuristic = Heuristic(state, "O");
+                int heuristic = Heuristic(state, "X");
                 // Debug writes
                 //state.printState();
                 //Console.Write($"heuristic value = {heuristic}, depth={depth}\n\n");
@@ -180,52 +182,90 @@ namespace MiniMax
             return true;
         }
 
-        public static int Heuristic(State state, string player)
+        public static int Heuristic(State state, string X)
         {
-            string enemy = player == "O" ? "X" : "O";
-            int player_point = 0;
+            string O = "O";
+            int O_point = 0;
+            Point O_move = state.pre.Value.Item2;
 
             for(int i = 0; i < BOARD_SIZE; i++)
             {
                 for(int j=0;j< BOARD_SIZE; j++)
                 {
                     Point currentPoint = new Point(i, j);
-                    if (state.board[i,j] == player)
+                    if (state.board[i,j] == X)
                     {
-                        (int, int) horizontal = CountHorizontal(currentPoint, player, state.board);
-                        (int, int) vertical = CountVertical(currentPoint, player, state.board);
-                        (int, int) diagonal1 = CountDiagonal1(currentPoint, player, state.board);
-                        (int, int) diagonal2 = CountDiagonal2(currentPoint, player, state.board);
-
+                        (int, int) horizontal = CountHorizontal(currentPoint, X, state.board);
+                        (int, int) vertical = CountVertical(currentPoint, X, state.board);
+                        (int, int) diagonal1 = CountDiagonal1(currentPoint, X, state.board);
+                        (int, int) diagonal2 = CountDiagonal2(currentPoint, X, state.board);
+                        
                         // Đánh giá trạng thái bằng heuristic cho từng quân đã đặt lên bàn cờ
                         // Nếu có LINE_SIZE - 1 quân liền nhau và hở 2 hoặc 1 đầu
-                        /*if (horizontal.Item2 == LINE_SIZE - 1 && horizontal.Item1 > 0) player_point = int.MaxValue;
-                        if (vertical.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;
-                        if (diagonal1.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;
-                        if (diagonal1.Item2 == LINE_SIZE - 1 && vertical.Item1 > 0) player_point = int.MaxValue;*/
+                        if (horizontal.Item1 == 2 && horizontal.Item2 == LINE_SIZE - 1) O_point = int.MinValue;
+                        else if (horizontal.Item1 == 1) O_point -= 50;
+                        if (vertical.Item1 == 2 && vertical.Item2 == LINE_SIZE - 1) O_point = int.MinValue;
+                        else if (vertical.Item1 == 1) O_point -= 50;
+                        if (diagonal1.Item1 == 2 && diagonal1.Item2 == LINE_SIZE - 1) O_point = int.MinValue;
+                        else if (diagonal1.Item1 == 1) O_point -= 50;
+                        if (diagonal2.Item1 == 2 && diagonal2.Item2 == LINE_SIZE - 1) O_point = int.MinValue;
+                        else if (diagonal2.Item1 == 1) O_point -= 50;
+
+                        
 
                         // Nếu có LINE_SIZE - 2 quân liền nhau và hở 2 hoặc 1 đầu
-                        if (horizontal.Item1 == 2 && horizontal.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
-                        else if (horizontal.Item1 == 1) player_point += 5;
-                        if (vertical.Item1 > 0 && vertical.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
-                        else if (vertical.Item1 == 1) player_point += 5;
-                        if (diagonal1.Item1 > 0 && diagonal1.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
-                        else if (diagonal1.Item1 == 1) player_point += 5;
-                        if (diagonal2.Item1 > 0 && diagonal2.Item2 == LINE_SIZE - 2) player_point += int.MaxValue;
-                        else if (diagonal2.Item1 == 1) player_point += 5;
-
-                        // Nếu có LINE_SIZE - 3 quân liền nhau và hở 2 hoặc 1 đầu
                         if (LINE_SIZE - 3 > 0)
                         {
-                            if (horizontal.Item1 > 0 && horizontal.Item2 == LINE_SIZE - 3) player_point += 3;
-                            if (vertical.Item1 > 0 && vertical.Item2 == LINE_SIZE - 3) player_point += 3;
-                            if (diagonal1.Item1 > 0 && diagonal1.Item2 == LINE_SIZE - 3) player_point += 3;
-                            if (diagonal2.Item1 > 0 && diagonal2.Item2 == LINE_SIZE - 3) player_point += 3;
+                            if (horizontal.Item1 > 0 && horizontal.Item2 == LINE_SIZE - 2) O_point -= 5;
+                            if (vertical.Item1 > 0 && vertical.Item2 == LINE_SIZE - 2) O_point -= 5;
+                            if (diagonal1.Item1 > 0 && diagonal1.Item2 == LINE_SIZE - 2) O_point -= 5;
+                            if (diagonal2.Item1 > 0 && diagonal2.Item2 == LINE_SIZE - 2) O_point -= 5;
                         }
+                    }
+                    else if(state.board[i, j] == O){
+                        (int, int) horizontal_enemy = CountHorizontal(currentPoint, O, state.board);
+                        (int, int) vertical_enemy = CountVertical(currentPoint, O, state.board);
+                        (int, int) diagonal1_enemy = CountDiagonal1(currentPoint, O, state.board);
+                        (int, int) diagonal2_enemy = CountDiagonal2(currentPoint, O, state.board);
+
+                        if (horizontal_enemy.Item1 == 2 && horizontal_enemy.Item2 == LINE_SIZE - 1) O_point = int.MaxValue;
+                        else if (horizontal_enemy.Item1 == 1) O_point += 50;
+                        if (vertical_enemy.Item1 == 2 && vertical_enemy.Item2 == LINE_SIZE - 1) O_point = int.MaxValue;
+                        else if (vertical_enemy.Item1 == 1) O_point += 50;
+                        if (diagonal1_enemy.Item1 == 2 && diagonal1_enemy.Item2 == LINE_SIZE - 1) O_point = int.MaxValue;
+                        else if (diagonal1_enemy.Item1 == 1) O_point += 50;
+                        if (diagonal2_enemy.Item1 == 2 && diagonal2_enemy.Item2 == LINE_SIZE - 1) O_point = int.MaxValue;
+                        else if (diagonal2_enemy.Item1 == 1) O_point += 50;
+
+                        if (LINE_SIZE - 3 > 0){
+                            if (horizontal_enemy.Item1 > 0 && horizontal_enemy.Item2 == LINE_SIZE - 2) O_point += 5;
+                            if (vertical_enemy.Item1 > 0 && vertical_enemy.Item2 == LINE_SIZE - 2) O_point += 5;
+                            if (diagonal1_enemy.Item1 > 0 && diagonal1_enemy.Item2 == LINE_SIZE - 2) O_point += 5;
+                            if (diagonal2_enemy.Item1 > 0 && diagonal2_enemy.Item2 == LINE_SIZE - 2) O_point += 5;
+                        }
+                        
                     }
                 }
             }
-            return player_point;
+
+            // Đánh giá nước đi trước của enemy(player)
+            Point left = O_move.Left;
+            Point right = O_move.Right;
+            Point down = O_move.Down;
+            Point up = O_move.Up;
+            Point upleft = O_move.UpLeft;
+            Point upright = O_move.UpRight;
+            Point downleft = O_move.DownLeft;
+            Point downright = O_move.DownRight;
+            if(isValid(left) && state.board[left.x, left.y] == X) O_point += 10;
+            if(isValid(right) && state.board[right.x, right.y] == X) O_point += 10;
+            if(isValid(down) && state.board[down.x, down.y] == X) O_point += 10;
+            if(isValid(up) && state.board[up.x, up.y] == X) O_point += 10;
+            if(isValid(upleft) && state.board[upleft.x, upleft.y] == X) O_point += 10;
+            if(isValid(downleft) && state.board[downleft.x, downleft.y] == X) O_point += 10;
+            if(isValid(upright) && state.board[upright.x, upright.y] == X) O_point += 10;
+            if(isValid(downright) && state.board[downright.x, downright.y] == X) O_point += 10;
+            return O_point;
         }
 
         // item1 = Số ô trống ở 2 đầu
