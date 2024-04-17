@@ -13,9 +13,13 @@ public class MainMenu : MonoBehaviour
     {
         if (boardSize != null && lineSize != null)
         {
-            StartGame.sizeOfBanCo = Convert.ToInt32(boardSize.text);
-            StartGame.lineSize = Convert.ToInt32(lineSize.text);
-            SceneManager.LoadSceneAsync(1);
+            if (int.TryParse(boardSize.text, out _) && int.TryParse(lineSize.text, out _))
+            {
+                StartGame.sizeOfBanCo = Convert.ToInt32(boardSize.text);
+                StartGame.lineSize = Convert.ToInt32(lineSize.text);
+                SceneManager.LoadSceneAsync(1);
+            }
+            
         }
     }
 

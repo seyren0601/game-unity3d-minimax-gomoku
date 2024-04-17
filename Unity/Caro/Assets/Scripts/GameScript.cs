@@ -4,11 +4,12 @@ using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
 using static MiniMax.MiniMax;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameScript : MonoBehaviour
 {
-    bool playerTurn {get;set;} = true;
-    State state {get;set;}
+    bool playerTurn { get; set; } = true;
+    State state { get; set; }
     public GameObject Black;
     public GameObject White;
     public AudioSource audioSource;
@@ -82,13 +83,38 @@ public class GameScript : MonoBehaviour
                 playerTurn = true;
             }
             result = CurrentState(state);
-            if (result == Result.XWin || result == Result.OWin)
+            if (result != Result.Pending)
             {
+                EndMain.state = state;
                 EndMain.whoWin = result.ToString();
-                SceneManager.LoadSceneAsync(2);
+                StartCoroutine(TakeAPicture(2f));
+                StartCoroutine(WaitASecond(3f));
             }
         }
         
+    }
+
+    IEnumerator WaitASecond(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        SceneManager.LoadSceneAsync(2);
+    }
+
+    private IEnumerator TakeAPicture(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        string folderPath = "Assets/Screenshots/"; // the path of your project folder
+
+        if (!System.IO.Directory.Exists(folderPath)) // if this path does not exist yet
+            System.IO.Directory.CreateDirectory(folderPath);  // it will get created
+
+        var screenshotName =
+                                "Screenshot_" +
+                                System.DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss") + // puts the current time right into the screenshot name
+                                ".png"; // put youre favorite data format here
+        ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(folderPath, screenshotName), 2); // takes the sceenshot, the "2" is for the scaled resolution, you can put this to 600 but it will take really long to scale the image up
+        Debug.Log(folderPath + screenshotName);
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){

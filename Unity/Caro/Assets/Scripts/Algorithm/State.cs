@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MiniMax
 {
-    internal class Point
+    public class Point
     {
         public int x; 
         public int y;
@@ -24,7 +24,7 @@ namespace MiniMax
             this.y = y;
         }
     }
-    internal class State
+    public class State
     {
         public string[,] board = { { " ", " ", " " }, { " ", " ", " " }, { " ", " ", " " } };
         public (State, Point, string)? pre = null;
