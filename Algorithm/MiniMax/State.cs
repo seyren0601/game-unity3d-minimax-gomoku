@@ -26,23 +26,40 @@ namespace MiniMax
     }
     internal class State
     {
-        public string[,] board = { { " ", " ", " " }, { " ", " ", " " }, { " ", " ", " " } };
+        public string[,] board { get; set; }
         public (State, Point, string)? pre = null;
         public State(string[,] board, (State, Point, string)? pre)
         {
             this.board = board;
             this.pre = pre;
         }
-        public State() { }
+        public State()
+        {
+            board = new string[MiniMax.BOARD_SIZE, MiniMax.BOARD_SIZE];
+            for(int i = 0; i < MiniMax.BOARD_SIZE; i++)
+            {
+                for(int j = 0; j < MiniMax.BOARD_SIZE; j++)
+                {
+                    board[i, j] = " ";
+                }
+            }
+        }
 
         public void printState()
         {
-            Console.WriteLine($"| {board[0, 0]} | {board[0, 1]} | {board[0, 2]} |");
-            Console.WriteLine("-------------");
-            Console.WriteLine($"| {board[1, 0]} | {board[1, 1]} | {board[1, 2]} |");
-            Console.WriteLine("-------------");
-            Console.WriteLine($"| {board[2, 0]} | {board[2, 1]} | {board[2, 2]} |");
-            Console.Write("-------------");
+            for(int i = 0; i < MiniMax.BOARD_SIZE; i++)
+            {
+                for(int j=0;j< MiniMax.BOARD_SIZE; j++)
+                {
+                    Console.Write($"| {board[i, j]} ");
+                }
+                Console.WriteLine("|");
+                for(int k = 0;k< MiniMax.BOARD_SIZE; k++)
+                {
+                    Console.Write("----");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }

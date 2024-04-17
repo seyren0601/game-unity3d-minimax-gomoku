@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using MiniMax;
-using UnityEditor.Build.Content;
+﻿using MiniMax;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
 using static MiniMax.MiniMax;
+using UnityEngine.SceneManagement;
 
 public class GameScript : MonoBehaviour
 {
@@ -17,19 +13,17 @@ public class GameScript : MonoBehaviour
     public GameObject White;
     public AudioSource audioSource;
     public AudioSource sGameOver;
-    Result result {get;set;}
+    static Result result {get;set;}
     GameInfo gameInfo;
-    StartGame gameStart;
     Camera main_camera;
     // Start is called before the first frame update
     void Start()
     {
         main_camera = Camera.main;
         gameInfo = gameObject.GetComponent<GameInfo>();
-        gameStart = gameObject.GetComponent<StartGame>();
-        string[,] startBoard = new string[gameStart.sizeOfBanCo, gameStart.sizeOfBanCo];
-        for(int i=0;i<gameStart.sizeOfBanCo;i++){
-            for(int j=0;j< gameStart.sizeOfBanCo; j++){
+        string[,] startBoard = new string[StartGame.sizeOfBanCo, StartGame.sizeOfBanCo];
+        for(int i=0;i<StartGame.sizeOfBanCo;i++){
+            for(int j=0;j< StartGame.sizeOfBanCo; j++){
                 startBoard[i, j] = " ";
             }
         }
@@ -40,25 +34,38 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(result == Result.Pending){
-            if(playerTurn){
+        //Debug click
+        /*Mouse mouse = Mouse.current;
+        if(mouse.leftButton.wasPressedThisFrame){
+            audioSource.Play();
+            Vector3 mousePosition = mouse.position.ReadValue();
+            //Debug.Log(mousePosition);
+            Ray ray = main_camera.ScreenPointToRay(mousePosition);
+            if(Physics.Raycast(ray, out RaycastHit hit)){
+                Debug.Log(hit.point);
+            }
+        }*/
+
+        //GameLoop
+        if (result == Result.Pending) {
+            if (playerTurn) {
                 Mouse mouse = Mouse.current;
-                if(mouse.leftButton.wasPressedThisFrame){
+                if (mouse.leftButton.wasPressedThisFrame) {
                     audioSource.Play();
                     Vector3 mousePosition = mouse.position.ReadValue();
                     //Debug.Log(mousePosition);
                     Ray ray = main_camera.ScreenPointToRay(mousePosition);
-                    if(Physics.Raycast(ray, out RaycastHit hit)){
+                    if (Physics.Raycast(ray, out RaycastHit hit)) {
                         Vector3 clicked = hit.point;
                         (int, int, Vector3)? move_point = GetCenterPoint(hit.point);
-                        if(move_point is not null){
+                        if (move_point is not null) {
                             Vector3 center_point = move_point.Value.Item3;
                             int i = move_point.Value.Item1;
                             int j = move_point.Value.Item2;
-                            if(state.board[i,j] == " "){
+                            if (state.board[i, j] == " ") {
                                 Instantiate(Black, center_point, Quaternion.identity);
                                 string[,] newboard = (string[,])state.board.Clone();
-                                newboard[i,j] = "X";
+                                newboard[i, j] = "X";
                                 state = new State(newboard, (state, new MiniMax.Point(i, j), "X"));
                                 playerTurn = false;
                             }
@@ -66,7 +73,7 @@ public class GameScript : MonoBehaviour
                     }
                 }
             }
-            else{
+            else {
                 MiniMax.Point move = MiniMax.MiniMax.AutoPlay_GetMove(state, "O");
                 Instantiate(White, gameInfo.center_points[move.x, move.y], Quaternion.identity);
                 string[,] newboard = (string[,])state.board.Clone();
@@ -75,12 +82,18 @@ public class GameScript : MonoBehaviour
                 playerTurn = true;
             }
             result = CurrentState(state);
+            if (result == Result.XWin || result == Result.OWin)
+            {
+                EndMain.whoWin = result.ToString();
+                SceneManager.LoadSceneAsync(2);
+            }
         }
+        
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){
-        for(int i=0;i<gameStart.sizeOfBanCo;i++){
-            for(int j=0;j<gameStart.sizeOfBanCo;j++){
+        for(int i=0;i<StartGame.sizeOfBanCo;i++){
+            for(int j=0;j<StartGame.sizeOfBanCo;j++){
                 float x_clicked = Clicked.x;
                 float z_clicked = Clicked.z;
                 Vector3 render_point = gameInfo.render_points[i,j];
