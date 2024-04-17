@@ -8,8 +8,10 @@ namespace MiniMax
 {
     internal class Point
     {
-        public int x; 
-        public int y;
+        // Tọa độ của nước đi
+        public int x; public int y;
+
+        // Các phương thức sinh ra nước đi mới từ nước đi hiện tại
         public Point Up { get { return new Point(x - 1, y); } }
         public Point Down { get { return new Point(x + 1, y); } }
         public Point Left { get { return new Point(x, y - 1); } }
@@ -26,8 +28,14 @@ namespace MiniMax
     }
     internal class State
     {
+        // Ma trận lưu lại trạng thái của bàn cờ
+        // Với giá trị lưu lại là string ("X"/"O")
         public string[,] board { get; set; }
+
+        // Thuộc tính pre lưu lại nước đi trước đó để đến được trạng thái hiện tại
         public (State, Point, string)? pre = null;
+
+        // Hàm khởi tạo
         public State(string[,] board, (State, Point, string)? pre)
         {
             this.board = board;
@@ -45,6 +53,7 @@ namespace MiniMax
             }
         }
 
+        // Hàm in bàn cờ để debug
         public void printState()
         {
             for(int i = 0; i < MiniMax.BOARD_SIZE; i++)

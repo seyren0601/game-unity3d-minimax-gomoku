@@ -8,8 +8,10 @@ namespace MiniMax
 {
     public class Point
     {
-        public int x; 
-        public int y;
+        // Tọa độ của nước đi
+        public int x; public int y;
+
+        // Các phương thức sinh ra nước đi mới từ nước đi hiện tại
         public Point Up { get { return new Point(x - 1, y); } }
         public Point Down { get { return new Point(x + 1, y); } }
         public Point Left { get { return new Point(x, y - 1); } }
@@ -26,23 +28,47 @@ namespace MiniMax
     }
     public class State
     {
-        public string[,] board = { { " ", " ", " " }, { " ", " ", " " }, { " ", " ", " " } };
+        // Ma trận lưu lại trạng thái của bàn cờ
+        // Với giá trị lưu lại là string ("X"/"O")
+        public string[,] board { get; set; }
+
+        // Thuộc tính pre lưu lại nước đi trước đó để đến được trạng thái hiện tại
         public (State, Point, string)? pre = null;
+
+        // Hàm khởi tạo
         public State(string[,] board, (State, Point, string)? pre)
         {
             this.board = board;
             this.pre = pre;
         }
-        public State() { }
+        public State()
+        {
+            board = new string[MiniMax.BOARD_SIZE, MiniMax.BOARD_SIZE];
+            for(int i = 0; i < MiniMax.BOARD_SIZE; i++)
+            {
+                for(int j = 0; j < MiniMax.BOARD_SIZE; j++)
+                {
+                    board[i, j] = " ";
+                }
+            }
+        }
 
+        // Hàm in bàn cờ để debug
         public void printState()
         {
-            Console.WriteLine($"| {board[0, 0]} | {board[0, 1]} | {board[0, 2]} |");
-            Console.WriteLine("-------------");
-            Console.WriteLine($"| {board[1, 0]} | {board[1, 1]} | {board[1, 2]} |");
-            Console.WriteLine("-------------");
-            Console.WriteLine($"| {board[2, 0]} | {board[2, 1]} | {board[2, 2]} |");
-            Console.Write("-------------");
+            for(int i = 0; i < MiniMax.BOARD_SIZE; i++)
+            {
+                for(int j=0;j< MiniMax.BOARD_SIZE; j++)
+                {
+                    Console.Write($"| {board[i, j]} ");
+                }
+                Console.WriteLine("|");
+                for(int k = 0;k< MiniMax.BOARD_SIZE; k++)
+                {
+                    Console.Write("----");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
