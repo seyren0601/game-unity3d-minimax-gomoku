@@ -10,12 +10,14 @@ namespace MiniMax
 {
     internal class Game
     {
+        // Enum cho biết lượt đi
         enum Turn
         {
             XTurn,
             OTurn
         }
 
+        // Trạng thái hiện tại của trò chơi
         static State currentState { get; set; } = new State() { };
 
         public void startGame()
