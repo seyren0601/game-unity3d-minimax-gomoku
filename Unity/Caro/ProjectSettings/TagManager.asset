@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - MatBanCo
+  - InputBoardSize
+  - InputLineSize
   layers:
   - Default
   - TransparentFX

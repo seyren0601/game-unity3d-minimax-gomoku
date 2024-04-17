@@ -20,9 +20,9 @@ namespace MiniMax
         }
         //public static int alpha;
         //public static int beta;
-        public const int BOARD_SIZE = 5;
-        const int LINE_SIZE = 4;
-        const int DEPTH = 4;
+        public static int BOARD_SIZE = Camera.main.GetComponent<GameInfo>().n;
+        public static int LINE_SIZE = StartGame.lineSize;
+        const int DEPTH = 2;
 
         public static Point AutoPlay_GetMove(State startState, string player)
         {

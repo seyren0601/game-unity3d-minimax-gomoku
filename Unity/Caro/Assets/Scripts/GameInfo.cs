@@ -16,7 +16,7 @@ public class GameInfo : MonoBehaviour
     {
         startGame = FindObjectOfType<StartGame>();
 
-        n = startGame.sizeOfBanCo;
+        n = StartGame.sizeOfBanCo;
         center_point_start_x = startGame.x_start;
         center_point_start_z = startGame.z_start;
         center_points = new Vector3[n, n];

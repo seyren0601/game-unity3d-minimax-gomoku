@@ -5,7 +5,8 @@ public class StartGame : MonoBehaviour
     public GameObject duongVien;
     private GameObject banCo;
 
-    public int sizeOfBanCo;
+    public static int sizeOfBanCo;
+    public static int lineSize;
 
     GameObject[,] duongViens;
 
@@ -18,6 +19,7 @@ public class StartGame : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        Debug.Log(sizeOfBanCo);
         float campos_x, campos_y, campos_z;
         campos_x = Camera.main.transform.position.x;
         campos_y = Camera.main.transform.position.y * (sizeOfBanCo * 0.3f);
