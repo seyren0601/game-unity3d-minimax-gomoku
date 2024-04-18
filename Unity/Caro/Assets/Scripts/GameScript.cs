@@ -18,11 +18,13 @@ public class GameScript : MonoBehaviour
     GameInfo gameInfo;
     Camera main_camera;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         main_camera = Camera.main;
         gameInfo = gameObject.GetComponent<GameInfo>();
         string[,] startBoard = new string[StartGame.sizeOfBanCo, StartGame.sizeOfBanCo];
+        Debug.Log($"sizeOfBanCo: {StartGame.sizeOfBanCo}");
+        Debug.Log($"linesize: {StartGame.lineSize}");
         for(int i=0;i<StartGame.sizeOfBanCo;i++){
             for(int j=0;j< StartGame.sizeOfBanCo; j++){
                 startBoard[i, j] = " ";

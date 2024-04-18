@@ -27,14 +27,14 @@ public class GameInfo : MonoBehaviour
 
 
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                Debug.Log($"render points của ô {i} | {j}: {render_points[i, j]}");
-                Debug.Log($"center points của ô {i} | {j}: {center_points[i, j]}");
-            }
-        }
+        //for (int i = 0; i < n; i++)
+        //{
+        //    for (int j = 0; j < n; j++)
+        //    {
+        //        Debug.Log($"render points của ô {i} | {j}: {render_points[i, j]}");
+        //        Debug.Log($"center points của ô {i} | {j}: {center_points[i, j]}");
+        //    }
+        //}
     }
 
     private void InputRenderPoints()
@@ -49,7 +49,7 @@ public class GameInfo : MonoBehaviour
             for (int j = 0; j < n; j++)
             {
                 render_points[i, j] = new Vector3(x, y, z);
-                Debug.Log($"center points vừa được thêm vào là: {x}, {y}, {z}");
+                //Debug.Log($"center points vừa được thêm vào là: {x}, {y}, {z}");
                 x += square_size;
             }
             z -= square_size;

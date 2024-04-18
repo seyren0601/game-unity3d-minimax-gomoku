@@ -21,6 +21,7 @@ public class StartGame : MonoBehaviour
     void Awake()
     {
         Debug.Log(sizeOfBanCo);
+        Debug.Log(lineSize);
         float campos_x, campos_y, campos_z;
         campos_x = Camera.main.transform.position.x;
         campos_y = Camera.main.transform.position.y * (sizeOfBanCo * 0.3f);

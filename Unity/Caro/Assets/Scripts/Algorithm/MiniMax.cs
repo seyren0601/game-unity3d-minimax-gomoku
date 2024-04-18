@@ -22,7 +22,7 @@ namespace MiniMax
         public static int beta_root;
         public static int BOARD_SIZE = StartGame.sizeOfBanCo;
         public static int LINE_SIZE = StartGame.lineSize;
-        const int DEPTH = 1;
+        const int DEPTH = 3;
 
         public static Point AutoPlay_GetMove(State startState, string player)
         {
@@ -97,10 +97,14 @@ namespace MiniMax
             List<State> Moves = new List<State>();
             string current_type = state.pre.Value.Item3 == "X" ? "O" : "X";
             string[,] board = state.board;
+            Debug.Log($"số lượng trong board là: {board.Length}");
+            Debug.Log($"số line size: {LINE_SIZE}");
+            Debug.Log($"số board size: {BOARD_SIZE}");
             for (int i = 0; i < BOARD_SIZE; i++)
             {
                 for (int j = 0; j < BOARD_SIZE; j++)
                 {
+                    Debug.Log($"Board Size lúc đó là {BOARD_SIZE}");
                     if (board[i, j] == " ")
                     {
                         Point point = new Point(i, j);
