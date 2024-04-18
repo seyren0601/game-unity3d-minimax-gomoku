@@ -1,4 +1,4 @@
-﻿using MiniMax;
+using MiniMax;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
@@ -8,9 +8,16 @@ using System.Collections;
 
 public class GameScript : MonoBehaviour
 {
+    // Thuộc tính để theo dõi lượt đi
     bool playerTurn { get; set; } = true;
+
+    // Thuộc tính để biết khi nào trò chơi bắt đầu
     public static bool GamePlaying {get;set;} = false;
+
+    // Thuộc tính ghi lại trạng thái hiện tại của trò chơi
     State state { get; set; }
+
+    // Các object quân cờ, âm thanh và thông tin khác của trò chơi
     public GameObject Black;
     public GameObject White;
     public AudioSource audioSource;
@@ -18,15 +25,11 @@ public class GameScript : MonoBehaviour
     static Result result {get;set;}
     GameInfo gameInfo;
     Camera main_camera;
-    // Start is called before the first frame update
-    void Awake()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
     {
+        // Nếu game đã bắt đầu, khởi tạo các cấu trúc dữ liệu để bắt đầu chạy trò chơi
         if(GamePlaying){
             main_camera = Camera.main;
             gameInfo = gameObject.GetComponent<GameInfo>();
@@ -56,6 +59,8 @@ public class GameScript : MonoBehaviour
 
         //GameLoop
         if (result == Result.Pending) {
+            // Ở lượt đi của người chơi, 
+            // thực hiện kiểm tra vùng click vào và đặt quân đen vào đó
             if (playerTurn) {
                 Mouse mouse = Mouse.current;
                 if (mouse.leftButton.wasPressedThisFrame) {
@@ -81,6 +86,8 @@ public class GameScript : MonoBehaviour
                     }
                 }
             }
+            // Ở lượt đi của máy, thực hiện chạy MiniMax để tìm nước đi tốt nhất
+            // sau đó đặt quân trắng vào đó
             else {
                 MiniMax.Point move = MiniMax.MiniMax.AutoPlay_GetMove(state, "O");
                 Instantiate(White, gameInfo.center_points[move.x, move.y], Quaternion.identity);
@@ -89,7 +96,11 @@ public class GameScript : MonoBehaviour
                 state = new State(newboard, (state, new MiniMax.Point(move.x, move.y), "O"));
                 playerTurn = true;
             }
+            // Xét kết quả của trạng thái hiện tại
             result = CurrentState(state);
+            // Nếu trạng thái hiện tại đã kết thúc (không phải Pending)
+            // Chuyển sang màn hình kết thúc và chụp lại trạng thái cuối cùng của bàn cờ
+            // và lưu vào folder Assets/Screenshots
             if (result != Result.Pending)
             {
                 EndMain.state = state;
@@ -121,7 +132,6 @@ public class GameScript : MonoBehaviour
                                 System.DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss") + // puts the current time right into the screenshot name
                                 ".png"; // put youre favorite data format here
         ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(folderPath, screenshotName), 2); // takes the sceenshot, the "2" is for the scaled resolution, you can put this to 600 but it will take really long to scale the image up
-        Debug.Log(folderPath + screenshotName);
     }
 
     (int, int, Vector3)? GetCenterPoint(Vector3 Clicked){
