@@ -2,6 +2,7 @@
 
 public class GameInfo : MonoBehaviour
 {
+    public static bool GamePlaying = false;
     public int n { get; set; }
     public float square_size {get;} = 2;
     public Vector3 [,] center_points { get; set; }
@@ -14,19 +15,6 @@ public class GameInfo : MonoBehaviour
 
     private void Start()
     {
-        startGame = FindObjectOfType<StartGame>();
-
-        n = StartGame.sizeOfBanCo;
-        center_point_start_x = startGame.x_start;
-        center_point_start_z = startGame.z_start;
-        center_points = new Vector3[n, n];
-        render_points = new Vector3[n, n];
-
-        InputRenderPoints();
-        InputCenterPoinst();
-
-
-
         //for (int i = 0; i < n; i++)
         //{
         //    for (int j = 0; j < n; j++)
@@ -35,6 +23,22 @@ public class GameInfo : MonoBehaviour
         //        Debug.Log($"center points của ô {i} | {j}: {center_points[i, j]}");
         //    }
         //}
+    }
+
+    private void Update(){
+        if(GamePlaying){
+            startGame = FindObjectOfType<StartGame>();
+
+            n = StartGame.sizeOfBanCo;
+            center_point_start_x = startGame.x_start;
+            center_point_start_z = startGame.z_start;
+            center_points = new Vector3[n, n];
+            render_points = new Vector3[n, n];
+
+            InputRenderPoints();
+            InputCenterPoinst();
+            GamePlaying = false;
+        }
     }
 
     private void InputRenderPoints()

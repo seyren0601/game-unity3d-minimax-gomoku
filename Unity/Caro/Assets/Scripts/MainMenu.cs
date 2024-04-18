@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MiniMax;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,9 +18,10 @@ public class MainMenu : MonoBehaviour
             {
                 StartGame.sizeOfBanCo = Convert.ToInt32(boardSize.text);
                 StartGame.lineSize = Convert.ToInt32(lineSize.text);
+                GameInfo.GamePlaying = true;
+                GameScript.GamePlaying = true;
                 SceneManager.LoadSceneAsync(1);
             }
-            
         }
     }
 

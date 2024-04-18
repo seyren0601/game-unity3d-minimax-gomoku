@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MiniMax
 {
-    internal class MiniMax
+    public class MiniMax
     {
         public enum Result
         {
@@ -20,8 +20,8 @@ namespace MiniMax
         }
         public static int alpha_root;
         public static int beta_root;
-        public static int BOARD_SIZE = StartGame.sizeOfBanCo;
-        public static int LINE_SIZE = StartGame.lineSize;
+        public static int BOARD_SIZE{get;set;}
+        public static int LINE_SIZE{get;set;}
         const int DEPTH = 3;
 
         public static Point AutoPlay_GetMove(State startState, string player)

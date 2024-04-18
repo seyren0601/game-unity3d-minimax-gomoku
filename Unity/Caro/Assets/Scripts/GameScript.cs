@@ -9,6 +9,7 @@ using System.Collections;
 public class GameScript : MonoBehaviour
 {
     bool playerTurn { get; set; } = true;
+    public static bool GamePlaying {get;set;} = false;
     State state { get; set; }
     public GameObject Black;
     public GameObject White;
@@ -20,23 +21,29 @@ public class GameScript : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        main_camera = Camera.main;
-        gameInfo = gameObject.GetComponent<GameInfo>();
-        string[,] startBoard = new string[StartGame.sizeOfBanCo, StartGame.sizeOfBanCo];
-        Debug.Log($"sizeOfBanCo: {StartGame.sizeOfBanCo}");
-        Debug.Log($"linesize: {StartGame.lineSize}");
-        for(int i=0;i<StartGame.sizeOfBanCo;i++){
-            for(int j=0;j< StartGame.sizeOfBanCo; j++){
-                startBoard[i, j] = " ";
-            }
-        }
-        state = new State(startBoard, null);
-        result = Result.Pending;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(GamePlaying){
+            main_camera = Camera.main;
+            gameInfo = gameObject.GetComponent<GameInfo>();
+            string[,] startBoard = new string[StartGame.sizeOfBanCo, StartGame.sizeOfBanCo];
+            for(int i=0;i<StartGame.sizeOfBanCo;i++){
+                for(int j=0;j< StartGame.sizeOfBanCo; j++){
+                    startBoard[i, j] = " ";
+                }
+            }
+            state = new State(startBoard, null);
+            result = Result.Pending;
+            BOARD_SIZE = StartGame.sizeOfBanCo;
+            LINE_SIZE = StartGame.lineSize;
+            Debug.Log($"sizeOfBanCo: {BOARD_SIZE}");
+            Debug.Log($"linesize: {LINE_SIZE}");
+            GamePlaying = false;
+        }
         //Debug click
         /*Mouse mouse = Mouse.current;
         if(mouse.leftButton.wasPressedThisFrame){
