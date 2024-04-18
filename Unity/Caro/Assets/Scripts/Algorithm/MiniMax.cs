@@ -186,7 +186,6 @@ namespace MiniMax
 
         public static int Heuristic(State state, string X)
         {
-            if(state == null) return 0;
             string O = "O";
             int O_point = 0;
             Point O_move = state.pre.Value.Item2;
