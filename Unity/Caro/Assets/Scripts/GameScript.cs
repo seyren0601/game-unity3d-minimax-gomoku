@@ -40,8 +40,6 @@ public class GameScript : MonoBehaviour
             result = Result.Pending;
             BOARD_SIZE = StartGame.sizeOfBanCo;
             LINE_SIZE = StartGame.lineSize;
-            Debug.Log($"sizeOfBanCo: {BOARD_SIZE}");
-            Debug.Log($"linesize: {LINE_SIZE}");
             GamePlaying = false;
         }
         //Debug click

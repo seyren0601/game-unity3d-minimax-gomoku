@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static MiniMax.Game;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace MiniMax
 {
@@ -22,7 +23,7 @@ namespace MiniMax
         public static int beta_root;
         public static int BOARD_SIZE{get;set;}
         public static int LINE_SIZE{get;set;}
-        const int DEPTH = 3;
+        const int DEPTH = 5;
 
         public static Point AutoPlay_GetMove(State startState, string player)
         {
@@ -97,14 +98,11 @@ namespace MiniMax
             List<State> Moves = new List<State>();
             string current_type = state.pre.Value.Item3 == "X" ? "O" : "X";
             string[,] board = state.board;
-            Debug.Log($"số lượng trong board là: {board.Length}");
-            Debug.Log($"số line size: {LINE_SIZE}");
-            Debug.Log($"số board size: {BOARD_SIZE}");
+
             for (int i = 0; i < BOARD_SIZE; i++)
             {
                 for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    Debug.Log($"Board Size lúc đó là {BOARD_SIZE}");
                     if (board[i, j] == " ")
                     {
                         Point point = new Point(i, j);
@@ -188,6 +186,7 @@ namespace MiniMax
 
         public static int Heuristic(State state, string X)
         {
+            if(state == null) return 0;
             string O = "O";
             int O_point = 0;
             Point O_move = state.pre.Value.Item2;
@@ -253,6 +252,7 @@ namespace MiniMax
             }
 
             // Đánh giá nước đi trước của enemy(player)
+
             Point left = O_move.Left;
             Point right = O_move.Right;
             Point down = O_move.Down;
